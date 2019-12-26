@@ -112,10 +112,23 @@ class ArchivePath:
             else:
                 members = descriptor.infolist()     # zip
 
+            top_level_items = set()
             # get files
             for member in members:
                 name = getattr(member, 'name', None) or member.filename
+                if not recursive:
+                    path, _sep, _name = name.partition('/')
+                    if path in top_level_items:
+                        continue
+
+                    top_level_items.add(path)
+                    yield self.copy(member_path=PurePath(path))
+                    continue
+
                 yield self.copy(member_path=PurePath(name))
+
+            if not recursive:
+                 return
 
             # get dirs
             names = set()
