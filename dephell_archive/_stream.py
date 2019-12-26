@@ -16,11 +16,12 @@ class ArchiveStream:
     encoding = attr.ib(type=Optional[str], default=None)
 
     def _get_info(self):
-        with suppress(KeyError):
-            if hasattr(self.descriptor, 'getmember'):
-                return self.descriptor.getmember(str(self.member_path))  # tar
-            return self.descriptor.getinfo(str(self.member_path))  # zip
-        return None
+        if hasattr(self.descriptor, 'getmember'):
+            return self.descriptor.getmember(str(self.member_path))  # tar
+        try:
+            return self.descriptor.getinfo(str(self.member_path) + '/')  # zip
+        except KeyError:
+            return None
 
     def exists(self) -> bool:
         return self._get_info() is not None
