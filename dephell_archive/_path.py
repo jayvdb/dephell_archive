@@ -176,17 +176,30 @@ class ArchivePath:
         new._descriptor = self._descriptor
         return new
 
-    def iterdir(self, recursive: bool = False) -> Iterator['ArchivePath']:
+    def iterdir(self, _recursive: bool = False) -> Iterator['ArchivePath']:
         with self.get_descriptor() as descriptor:
             if hasattr(descriptor, 'getmembers'):
                 members = descriptor.getmembers()   # tar
             else:
                 members = descriptor.infolist()     # zip
 
+            top_level_items = set()
             # get files
             for member in members:
                 name = getattr(member, 'name', None) or member.filename
+                if not _recursive:
+                    path, _sep, _name = name.partition('/')
+                    if path in top_level_items:
+                        continue
+
+                    top_level_items.add(path)
+                    yield self.copy(member_path=PurePath(path))
+                    continue
+
                 yield self.copy(member_path=PurePath(name))
+
+            if not _recursive:
+                 return
 
             # get dirs
             names = set()
@@ -203,7 +216,7 @@ class ArchivePath:
                 yield self.copy(member_path=PurePath(path))
 
     def glob(self, pattern: str) -> Iterator['ArchivePath']:
-        for path in self.iterdir(recursive=True):
+        for path in self.iterdir(_recursive=True):
             if glob_path(path=path.member_path.as_posix(), pattern=pattern):
                 yield path
 
