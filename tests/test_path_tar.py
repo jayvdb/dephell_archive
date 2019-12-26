@@ -137,7 +137,6 @@ def test_iterdir_recursive_wheel(tmpdir):
 
     for path in paths:
         assert paths.count(path) == 1, 'duplicate dir: ' + path
-    assert 'dephell-0.2.0' in paths
 
 
 def test_exists(tmpdir):
