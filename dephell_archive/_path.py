@@ -187,6 +187,17 @@ class ArchivePath:
             # get files
             for member in members:
                 name = getattr(member, 'name', None) or member.filename
+                if self.member_path.name:
+                    if str(self.member_path) not in name:
+                        continue
+                    name = name[len(str(self.member_path)):]
+                    if not name:
+                        continue
+                    # remove '/'
+                    name = name[1:]
+                    if not name:
+                        continue
+
                 if not _recursive:
                     path, _sep, _name = name.partition('/')
                     if path in top_level_items:
@@ -205,6 +216,17 @@ class ArchivePath:
             names = set()
             for member in members:
                 name = getattr(member, 'name', None) or member.filename
+                if self.member_path.name:
+                    if str(self.member_path) not in name:
+                        continue
+                    name = name[len(str(self.member_path)):]
+                    if not name:
+                        continue
+                    # remove '/'
+                    name = name[1:]
+                    if not name:
+                        continue
+
                 name = name.rstrip('/')
                 names.add(name)
             dirs = {''}
