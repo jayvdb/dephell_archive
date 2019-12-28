@@ -188,9 +188,10 @@ class ArchivePath:
             for member in members:
                 name = getattr(member, 'name', None) or member.filename
                 if self.member_path.name:
-                    if str(self.member_path) not in name:
+                    if self.member_path.as_posix() not in name:
+                        print('{} not in {}'.format(self.member_path.as_posix(), name))
                         continue
-                    name = name[len(str(self.member_path)):]
+                    name = name[len(self.member_path.as_posix()):]
                     if not name:
                         continue
                     # remove '/'
@@ -217,9 +218,9 @@ class ArchivePath:
             for member in members:
                 name = getattr(member, 'name', None) or member.filename
                 if self.member_path.name:
-                    if str(self.member_path) not in name:
+                    if self.member_path.as_posix() not in name:
                         continue
-                    name = name[len(str(self.member_path)):]
+                    name = name[len(self.member_path.as_posix()):]
                     if not name:
                         continue
                     # remove '/'
